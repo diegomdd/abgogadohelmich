@@ -1,26 +1,290 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import Layout from '../layouts/Layout.astro';
+
+const email = "rudolf@abogadohelmich.cl";
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>👨‍⚖️ Abogado Helmich</h1>
-			<p>
-				Bienvenido al sitio web de Abogado Helmich.
-			</p>
-			<p>
-				Este sitio está actualmente en construcción. Pronto encontrará aquí más información sobre mis servicios legales.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<Layout title="Abogado Helmich | Servicios Legales" description="Sitio oficial de Abogado Helmich. Servicios legales de excelencia.">
+	<header class="header">
+		<div class="container header-content">
+			<a href="/" class="logo">Abogado Helmich</a>
+			<a href="#contacto" class="btn-sm">Contactar</a>
+		</div>
+	</header>
+
+	<main>
+		<section class="hero">
+			<div class="container hero-content">
+				<span class="badge">Sitio en Construcción</span>
+				<h1>Excelencia y Compromiso Legal</h1>
+				<p>Estamos trabajando en nuestra nueva presencia digital para servirle mejor. <br>Si tiene una consulta inmediata, no dude en contactarnos.</p>
+				<a href="#contacto" class="btn">Contáctenos Ahora</a>
+			</div>
+		</section>
+
+		<section class="services">
+			<div class="container">
+				<h2>Nuestras Áreas de Práctica</h2>
+				<div class="grid">
+					<div class="card">
+						<h3>Derecho Civil</h3>
+						<p>Asesoría integral en conflictos civiles, contratos y responsabilidad.</p>
+					</div>
+					<div class="card">
+						<h3>Derecho Comercial</h3>
+						<p>Estrategias legales sólidas para empresas y negocios en crecimiento.</p>
+					</div>
+					<div class="card">
+						<h3>Litigios</h3>
+						<p>Representación experta y defensa rigurosa en tribunales de justicia.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section id="contacto" class="contact">
+			<div class="container">
+				<div class="contact-wrapper">
+					<div class="contact-info">
+						<h2>Hablemos de su Caso</h2>
+						<p>Complete el formulario o envíenos un correo directo para agendar una consulta inicial.</p>
+						
+						<div class="info-item">
+							<strong>Email</strong>
+							<a href={`mailto:${email}`}>{email}</a>
+						</div>
+					</div>
+
+					<div class="contact-form">
+						<form action={`https://formspree.io/f/${email}`} method="POST">
+							<!-- Hack: Using a mailto fallback visually if formspree isn't setup, 
+							     but sticking to user request for "form to email". 
+								Ideally, a backend or service is needed. 
+								For now, we use a simple form that opens mail client via JS or action mailto 
+								is not standard HTML5 but we can try to make it look pro. 
+								Actually, standard practice for static sites is Formspree or similar.
+								I will use a direct mailto form approach as a fallback or a simulated form.
+								
+								User asked: "formulario de contacto al correo rudolf@abogadohelmich.cl"
+								HTML forms cannot POST directly to email without a service.
+								I will implement a form that uses `mailto:` as the action (basic) 
+								or suggest a service. Given "just build it", `action="mailto:..."` is the 
+								closest pure-static implementation, though raw. 
+								Better approach: Simple UI that encourages clicking the mail link.
+							-->
+							
+							<div class="form-group">
+								<label for="name">Nombre Completo</label>
+								<input type="text" id="name" name="name" required placeholder="Su nombre">
+							</div>
+							
+							<div class="form-group">
+								<label for="email">Correo Electrónico</label>
+								<input type="email" id="email" name="email" required placeholder="su@correo.com">
+							</div>
+							
+							<div class="form-group">
+								<label for="message">Mensaje</label>
+								<textarea id="message" name="message" rows="5" required placeholder="Describa brevemente su situación..."></textarea>
+							</div>
+
+							<button type="submit" class="btn btn-block">Enviar Mensaje</button>
+							<p class="form-note">Al hacer clic, se abrirá su cliente de correo predeterminado.</p>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<footer>
+		<div class="container">
+			<p>&copy; {new Date().getFullYear()} Abogado Helmich. Todos los derechos reservados.</p>
+		</div>
+	</footer>
+</Layout>
+
+<script define:vars={{ email }}>
+	// Progressive enhancement: Intercept form submit to construct a proper mailto link
+	// allowing the user to send emails without a backend service knowing the constraints.
+	const form = document.querySelector('form');
+	form.addEventListener('submit', (e) => {
+		e.preventDefault();
+		const formData = new FormData(form);
+		const name = formData.get('name');
+		const userEmail = formData.get('email');
+		const message = formData.get('message');
+
+		const subject = `Nuevo contacto web: ${name}`;
+		const body = `Nombre: ${name}\nEmail: ${userEmail}\n\nMensaje:\n${message}`;
+
+		window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+	});
+</script>
+
+<style>
+	/* Header */
+	.header {
+		padding: 1.5rem 0;
+		background: white;
+		border-bottom: 1px solid #e2e8f0;
+		position: sticky;
+		top: 0;
+		z-index: 100;
+	}
+	.header-content {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.logo {
+		font-family: var(--font-heading);
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: var(--color-primary);
+	}
+	.btn-sm {
+		padding: 0.5rem 1rem;
+		border: 1px solid var(--color-primary);
+		border-radius: 4px;
+		font-size: 0.9rem;
+		color: var(--color-primary);
+	}
+	.btn-sm:hover {
+		background: var(--color-primary);
+		color: white;
+	}
+
+	/* Hero */
+	.hero {
+		background-color: var(--color-primary);
+		color: white;
+		padding: 6rem 0;
+		text-align: center;
+	}
+	.hero-content {
+		max-width: 800px;
+		margin: 0 auto;
+	}
+	.badge {
+		background: var(--color-secondary);
+		color: white;
+		padding: 0.25rem 0.75rem;
+		border-radius: 9999px;
+		font-size: 0.85rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		font-weight: 600;
+		display: inline-block;
+		margin-bottom: 1.5rem;
+	}
+	.hero h1 {
+		color: white;
+		font-size: 3.5rem;
+		line-height: 1.1;
+		margin-bottom: 1.5rem;
+	}
+	.hero p {
+		font-size: 1.25rem;
+		color: #94a3b8;
+		margin-bottom: 2rem;
+	}
+
+	/* Services */
+	.services {
+		padding: 5rem 0;
+		background: var(--color-light-bg);
+	}
+	.services h2 {
+		text-align: center;
+		margin-bottom: 3rem;
+		font-size: 2rem;
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 2rem;
+	}
+	.card {
+		background: white;
+		padding: 2rem;
+		border-radius: 8px;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		border-top: 4px solid var(--color-secondary);
+	}
+	.card h3 {
+		font-size: 1.5rem;
+		margin-bottom: 1rem;
+	}
+
+	/* Contact */
+	.contact {
+		padding: 5rem 0;
+	}
+	.contact-wrapper {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 4rem;
+		align-items: start;
+	}
+	.info-item {
+		margin-top: 2rem;
+	}
+	.info-item strong {
+		display: block;
+		font-size: 0.9rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: #64748b;
+		margin-bottom: 0.25rem;
+	}
+	.info-item a {
+		font-size: 1.25rem;
+		font-weight: 600;
+	}
+
+	.contact-form {
+		background: white;
+		padding: 2rem;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+	}
+	.form-group {
+		margin-bottom: 1.5rem;
+	}
+	.form-group label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-weight: 500;
+		color: var(--color-primary);
+	}
+	.btn-block {
+		width: 100%;
+	}
+	.form-note {
+		font-size: 0.85rem;
+		color: #64748b;
+		margin-top: 1rem;
+		text-align: center;
+	}
+
+	/* Footer */
+	footer {
+		background: var(--color-primary);
+		color: #94a3b8;
+		padding: 2rem 0;
+		text-align: center;
+		font-size: 0.9rem;
+	}
+
+	/* Mobile Responsive */
+	@media (max-width: 768px) {
+		.hero h1 {
+			font-size: 2.5rem;
+		}
+		.contact-wrapper {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+	}
+</style>
